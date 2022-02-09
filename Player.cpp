@@ -95,10 +95,43 @@ string Player::viewHand()
             }
             char colourChar = playerHand->getTile(i)->colour;
             string shapeString = to_string(playerHand->getTile(i)->shape);
+            playerHandString += printColour(i);
             playerHandString += colourChar;
             playerHandString.append(shapeString);
+            playerHandString.append("\033[38;5;15m");
             firstLoop = false;
         }
     }
     return playerHandString;
+}
+
+string Player::printColour(int i){
+    string colour;
+
+    char c = playerHand->getTile(i)->colour;
+    switch(c)
+    {
+        case 'R':
+        colour = "\033[38;5;196m";
+        break;
+        case 'O':
+        colour = "\033[38;5;208m";
+        break;
+        case 'Y':
+        colour = "\033[38;5;226m";
+        break;
+        case 'G':
+        colour = "\033[38;5;10m";
+        break;
+        case 'B':
+        colour = "\033[38;5;33m";
+        break;
+        case 'P':
+        colour = "\033[38;5;57m";
+        break;
+        default:
+        colour = "";
+    }
+
+    return colour;
 }

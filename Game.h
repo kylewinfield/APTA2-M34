@@ -65,6 +65,9 @@ public:
    // displays error messages to the player
    void displayErrors();
 
+   // colour board tiles
+   string printColour(vector<vector<Tile *>> board, int i, int j);
+
 private:
    vector<vector<Tile *>> board;
    LinkedList *tileBag;

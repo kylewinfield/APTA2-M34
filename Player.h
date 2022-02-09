@@ -22,6 +22,7 @@ public:
     string viewHand();
     int getHandSize();
     Tile *checkTile(Colour checkColour, Shape checkShape);
+    string printColour(int i);
 
     // Method to check if the tile exists in the players hand.
     // If tile exists, removes it from the player's hand and returns

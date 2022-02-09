@@ -384,13 +384,49 @@ void Game::printBoard(vector<vector<Tile *>> board)
             }
             else
             {
-                cout << board[i][j]->colour << board[i][j]->shape << "|";
+                cout << printColour(board, i, j) << board[i][j]->colour 
+                << board[i][j]->shape << "\033[38;5;15m" << "|";
             }
         }
         cout << endl;
     }
     cout << endl;
 }
+
+string Game::printColour(vector<vector<Tile *>> board, int i, int j){
+    string colour;
+
+    char c = board[i][j]->colour;
+
+    // cout << [COLOUR] "text" << endl
+    switch(c)
+    {
+        case 'R':
+        colour = "\033[38;5;196m";
+        break;
+        case 'O':
+        colour = "\033[38;5;208m";
+        break;
+        case 'Y':
+        colour = "\033[38;5;226m";
+        break;
+        case 'G':
+        colour = "\033[38;5;10m";
+        break;
+        case 'B':
+        colour = "\033[38;5;33m";
+        break;
+        case 'P':
+        colour = "\033[38;5;57m";
+        break;
+        default:
+        colour = "";
+    }
+    
+    return colour;
+}
+
+
 
 void Game::saveGame(string filename)
 {
