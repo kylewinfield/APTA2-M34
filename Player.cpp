@@ -79,7 +79,7 @@ Tile *Player::playTile(Colour checkColour, Shape checkShape)
     return returnTile;
 }
 
-string Player::viewHand()
+string Player::viewHand(bool disableColour)
 {
     string playerHandString = "";
     bool firstLoop = true;
@@ -95,41 +95,49 @@ string Player::viewHand()
             }
             char colourChar = playerHand->getTile(i)->colour;
             string shapeString = to_string(playerHand->getTile(i)->shape);
-            playerHandString += printColour(i);
+
+            if (disableColour == false)
+            {
+                playerHandString += printColour(i);
+            }
             playerHandString += colourChar;
             playerHandString.append(shapeString);
-            playerHandString.append("\033[38;5;15m");
+            if (disableColour == false)
+            {
+                playerHandString.append("\033[38;5;15m");
+            }
             firstLoop = false;
         }
     }
     return playerHandString;
 }
 
-string Player::printColour(int i){
+string Player::printColour(int i)
+{
     string colour;
 
     char c = playerHand->getTile(i)->colour;
-    switch(c)
+    switch (c)
     {
-        case 'R':
+    case 'R':
         colour = "\033[38;5;196m";
         break;
-        case 'O':
+    case 'O':
         colour = "\033[38;5;208m";
         break;
-        case 'Y':
+    case 'Y':
         colour = "\033[38;5;226m";
         break;
-        case 'G':
+    case 'G':
         colour = "\033[38;5;10m";
         break;
-        case 'B':
+    case 'B':
         colour = "\033[38;5;33m";
         break;
-        case 'P':
+    case 'P':
         colour = "\033[38;5;57m";
         break;
-        default:
+    default:
         colour = "";
     }
 

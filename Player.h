@@ -19,7 +19,7 @@ public:
     int getScore();
     void addScore(int score);
     void addTile(Tile* tile);
-    string viewHand();
+    string viewHand(bool disableColour);
     int getHandSize();
     Tile *checkTile(Colour checkColour, Shape checkShape);
     string printColour(int i);

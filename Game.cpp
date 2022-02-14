@@ -2,6 +2,7 @@
 #include <string>
 #include <cctype>
 #include <strings.h>
+#include <string.h>
 #include <vector>
 #include <fstream>
 #include <sstream>
@@ -33,7 +34,30 @@ Game::Game()
     this->invalidCommand = false;
     this->tileNotInHand = false;
     this->playerTurn = true;
+
+    this->ai = false;
+    this->disableEnhance = false;
+    this->disableColour = false;
 };
+
+Game::Game(int argc, char** argv){
+    // initialise tileBag
+    this->tileBag = new LinkedList;
+
+    // intialise checks to false
+    this->gameOver = false;
+    this->qwirkleScored = false;
+    this->cellOccupied = false;
+    this->notAdjacent = false;
+    this->tileMismatch = false;
+    this->lineTooLong = false;
+    this->sameTileInLine = false;
+    this->invalidCommand = false;
+    this->tileNotInHand = false;
+    this->playerTurn = true;
+
+    checkArgs(argc, argv);
+}
 
 Game::~Game()
 {
@@ -383,7 +407,7 @@ void Game::printBoard(vector<vector<Tile *>> board)
                      << "|";
             }
             else
-            {
+            { 
                 cout << printColour(board, i, j) << board[i][j]->colour 
                 << board[i][j]->shape << "\033[38;5;15m" << "|";
             }
@@ -394,9 +418,11 @@ void Game::printBoard(vector<vector<Tile *>> board)
 }
 
 string Game::printColour(vector<vector<Tile *>> board, int i, int j){
-    string colour;
+    string colour = "";
 
     char c = board[i][j]->colour;
+
+    if (disableColour == false){
 
     // cout << [COLOUR] "text" << endl
     switch(c)
@@ -422,11 +448,11 @@ string Game::printColour(vector<vector<Tile *>> board, int i, int j){
         default:
         colour = "";
     }
+
+    }
     
     return colour;
 }
-
-
 
 void Game::saveGame(string filename)
 {
@@ -434,10 +460,10 @@ void Game::saveGame(string filename)
     savefile.open("Saved/" + filename + ".save");
     savefile << player1->getName() << "\n";
     savefile << player1->getScore() << "\n";
-    savefile << player1->viewHand() << "\n";
+    savefile << player1->viewHand(true) << "\n";
     savefile << player2->getName() << "\n";
     savefile << player2->getScore() << "\n";
-    savefile << player2->viewHand() << "\n";
+    savefile << player2->viewHand(true) << "\n";
 
     // board dimensions
     int rowLength = 0;
@@ -925,7 +951,7 @@ void Game::getPrompt(Player *player)
     cout << player2->getName() << ": " << player2->getScore() << " points" << endl;
     cout << endl;
     cout << player->getName() << ", it's your turn, your hand is:" << endl;
-    cout << player->viewHand() << endl;
+    cout << player->viewHand(disableColour) << endl;
     cout << endl;
 
     string input;
@@ -975,7 +1001,7 @@ void Game::getPrompt(Player *player)
                     displayErrors();
                     cout << endl;
                     cout << "Tiles available:" << endl;
-                    cout << player->viewHand() << endl;
+                    cout << player->viewHand(disableColour) << endl;
                 }
             }
             else if (input.length() == 15)
@@ -1011,7 +1037,7 @@ void Game::getPrompt(Player *player)
                         displayErrors();
                         cout << endl;
                         cout << "Tiles available:" << endl;
-                        cout << player->viewHand() << endl;
+                        cout << player->viewHand(disableColour) << endl;
                     }
                 }
             }
@@ -1038,7 +1064,7 @@ void Game::getPrompt(Player *player)
                 displayErrors();
                 cout << endl;
                 cout << "Tiles available:" << endl;
-                cout << player->viewHand() << endl;
+                cout << player->viewHand(disableColour) << endl;
             }
         }
         // command to save game
@@ -1075,7 +1101,7 @@ void Game::getPrompt(Player *player)
             displayErrors();
             cout << endl;
             cout << "Tiles available:" << endl;
-            cout << player->viewHand() << endl;
+            cout << player->viewHand(disableColour) << endl;
         }
     }
 }
@@ -1093,6 +1119,30 @@ void Game::clearScreen()
 {
     // left out to allow test cases and for lecturer viewing
     // cout << "\x1B[2J\x1B[H";
+}
+
+void Game::checkArgs(int argc, char** argv){
+
+      // iterate through argv and check each argument for a related command
+
+    cout << "Arg is: " << argv[1] << endl;
+     for (int i = 1; i < argc; i++){
+        if (strcmp(argv[i], "--ai") == 0){
+            this->ai = true;
+        } else {
+            this->ai = false;
+        }
+        if (strcmp(argv[i], "--enh") == 0){
+            this->disableEnhance = true;
+        } else {
+            this->disableEnhance = false;
+        }
+        if (strcmp(argv[i], "--col") == 0){
+            this->disableColour = true;
+        }else {
+            this->disableColour = false;
+        }
+    }
 }
 
 void Game::displayErrors()

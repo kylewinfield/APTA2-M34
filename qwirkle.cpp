@@ -12,7 +12,7 @@ using std::ofstream;
 using std::string;
 using std::vector;
 
-void menu();
+void menu(int argc, char** argv);
 void showCredits();
 void printBoard(vector<vector<Tile *>> board);
 void clearScreen();
@@ -21,16 +21,17 @@ string loadGame();
 Game *game;
 bool quit;
 
-int main(void)
+int main(int argc, char** argv)
 {
    // on launch message
    cout << "Welcome to Qwirkle!" << endl;
    cout << "-------------------" << endl;
+   cout << "☘ ● ✦ ◆ ■ ✶" << endl;
 
    quit = false;
    while (!quit && !cin.eof())
    {
-      menu();
+         menu(argc, argv);
    }
 
    // checks for Control-D / EOF
@@ -45,7 +46,7 @@ int main(void)
 }
 
 // main selection menu implemented as switch statement
-void menu()
+void menu(int argc, char** argv)
 {
    cout << "Menu" << endl;
    cout << "----" << endl;
@@ -66,7 +67,11 @@ void menu()
       {
       case 1:
          // create new game
-         game = new Game();
+         if (argc > 1){
+            game = new Game(argc, argv);
+         }else {
+            game = new Game();
+         }
          game->newGame();
          // start game with loaded parameters
          if (!cin.eof())
@@ -77,7 +82,13 @@ void menu()
          }
          break;
       case 2:
-         game = new Game();
+
+         if (argc > 1){
+            game = new Game(argc, argv);
+         }else {
+            game = new Game();
+         }
+
          if (game->loadFile(loadGame()) == true)
          {
             // start game with loaded parameters

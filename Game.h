@@ -20,6 +20,7 @@ class Game
 {
 public:
    Game();
+   Game(int argc, char** argv);
    ~Game();
 
    // create a new game
@@ -65,6 +66,9 @@ public:
    // displays error messages to the player
    void displayErrors();
 
+   //checks arguement for enhancement disable
+   void checkArgs(int argc, char** argv);
+
    // colour board tiles
    string printColour(vector<vector<Tile *>> board, int i, int j);
 
@@ -99,6 +103,11 @@ private:
    bool sameTileInLine;
    // generic error
    bool invalidCommand;
+
+   // enhancments states for disabling/enabling via command line
+   bool ai;
+   bool disableEnhance;
+   bool disableColour;
 };
 
 #endif // ASSIGN2_GAME_H
