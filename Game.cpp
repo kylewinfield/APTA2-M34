@@ -230,7 +230,7 @@ void Game::AITurn()
 
     if (noMove == false)
     {
-        player2->addScore(placeTile(bestTile, bestRow, bestCol));
+        player2->addScore(placeTile(player2->playTile(bestTile->colour, bestTile->shape), bestRow, bestCol));
         addNullAdjacentSpaces(bestRow, bestCol);
     }
     else
@@ -242,21 +242,40 @@ void Game::AITurn()
 void Game::addNullAdjacentSpaces(char row, int col)
 {
 
-    // need to add coordinates of space if not already in list AND value on board is NULL
     Coordinate down(row + 1, col);
     Coordinate up(row - 1, col);
     Coordinate right(row, col + 1);
     Coordinate left(row, col - 1);
 
+    // if first AI move, add all by default (unless out of bounds)
     if (AIList.size() == 0)
     {
-        AIList.push_back(right);
-        AIList.push_back(left);
-        AIList.push_back(down);
-        AIList.push_back(up);
+        if (col + 1 <= 25)
+        {
+            AIList.push_back(right);
+        }
+        if (col - 1 >= 0)
+        {
+            AIList.push_back(left);
+        }
+
+        if (row + 1 <= 'Z')
+        {
+            AIList.push_back(down);
+        }
+        if (row - 1 >= 'A')
+        {
+            AIList.push_back(up);
+        }
     }
     else
     {
+        // flags are triggered if space is not eligible for list
+        // ineligible conditions:
+        // -in list already
+        // -outside bounds of board
+        // -space has tile placed in it
+
         bool downflag = false;
         bool upflag = false;
         bool rightflag = false;
@@ -264,7 +283,11 @@ void Game::addNullAdjacentSpaces(char row, int col)
 
         for (unsigned i = 0; AIList.size() > i; i++)
         {
-            if (down.isSpaceNull(board) == false)
+            if (row + 1 > 'Z')
+            {
+                downflag = true;
+            }
+            else if (down.isSpaceNull(board) == false)
             {
                 // cout << "AIList[]: " << AIList[i].getRow() << AIList[i].getCol() << endl;
                 // cout << "down: " << down.getRow() << down.getCol() << endl;
@@ -277,7 +300,12 @@ void Game::addNullAdjacentSpaces(char row, int col)
                     downflag = true;
                 }
             }
-            if (up.isSpaceNull(board) == false)
+
+            if (row - 1 < 'A')
+            {
+                downflag = true;
+            }
+            else if (up.isSpaceNull(board) == false)
             {
                 // cout << "AIList[]: " << AIList[i].getRow() << AIList[i].getCol() << endl;
                 // cout << "up: " <<    up.getRow() << up.getCol() << endl;
@@ -290,7 +318,12 @@ void Game::addNullAdjacentSpaces(char row, int col)
                     upflag = true;
                 }
             }
-            if (right.isSpaceNull(board) == false)
+
+            if (col + 1 > 25)
+            {
+                rightflag = true;
+            }
+            else if (right.isSpaceNull(board) == false)
             {
                 // cout << "AIList[]: " << AIList[i].getRow() << AIList[i].getCol() << endl;
                 // cout << "right: " << right.getRow() << right.getCol() << endl;
@@ -303,7 +336,12 @@ void Game::addNullAdjacentSpaces(char row, int col)
                     rightflag = true;
                 }
             }
-            if (left.isSpaceNull(board) == false)
+
+            if (col - 1 < 0)
+            {
+                leftflag = true;
+            }
+            else if (left.isSpaceNull(board) == false)
             {
                 // cout << "AIList[]: " << AIList[i].getRow() << AIList[i].getCol() << endl;
                 // cout << "left: " << left.getRow() << left.getCol() << endl;
@@ -317,8 +355,8 @@ void Game::addNullAdjacentSpaces(char row, int col)
                 }
             }
         }
-        // cout << "left: " << board[row][col - 1]->colour << board[row][col - 1]->shape << endl;
 
+        // if flag triggered, do not add to AIList
         if (downflag == false)
         {
             cout << "Down added: " << down.getRow() << down.getCol() << endl;
@@ -340,7 +378,8 @@ void Game::addNullAdjacentSpaces(char row, int col)
             AIList.push_back(left);
         }
 
-        // removes non-null spaces from AIList
+        // removes non-null spaces from AIList (needed as spaces get placed on top of
+        // existing then-empty spaces in list)
         vector<Coordinate> newList;
         for (unsigned i = 0; AIList.size() > i; i++)
         {
@@ -1217,6 +1256,12 @@ void Game::getPrompt(Player *player)
                         // place tile on board and award score (excludes first move of game)
                         player->addScore(placeTile(player->playTile(colour, shape), row, col));
                         valid = true;
+
+                        // add squares to AIList if AI enabled
+                        if (ai == true)
+                        {
+                            addNullAdjacentSpaces(row, col);
+                        }
 
                         // unset firstMove after first tile is placed
                         if (this->firstMove)
