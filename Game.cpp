@@ -36,11 +36,11 @@ Game::Game()
     this->playerTurn = true;
 
     this->ai = false;
-    this->disableEnhance = false;
     this->disableColour = false;
 };
 
-Game::Game(int argc, char** argv){
+Game::Game(int argc, char **argv)
+{
     // initialise tileBag
     this->tileBag = new LinkedList;
 
@@ -130,14 +130,23 @@ void Game::gameLoop()
                     }
                     while (validPrompt == false)
                     {
-                        try
+                        if (ai == true)
                         {
-                            getPrompt(this->player2);
+                            AITurn();
                             validPrompt = true;
                         }
-                        catch (...)
+                        else
                         {
-                            cout << "Invalid input!" << endl;
+
+                            try
+                            {
+                                getPrompt(this->player2);
+                                validPrompt = true;
+                            }
+                            catch (...)
+                            {
+                                cout << "Invalid input!" << endl;
+                            }
                         }
                     }
                     validPrompt = false;
@@ -179,6 +188,177 @@ void Game::gameLoop()
             cout << endl;
         }
     }
+}
+
+void Game::AITurn()
+{
+    // data needed to perform 'best' move
+    int highestScore = 0;
+    Tile *bestTile = nullptr;
+    char bestRow = '-';
+    int bestCol = 0;
+
+    // flag if no available moves
+    bool noMove = false;
+
+    // ->Iterate through hand (get each tile).
+    // -->Calculate possible scores from that tile on each space in AIList, that is
+    // a valid move.
+    // ->After iterating through all tiles, select highest scoring move and perform it
+
+    for (int i = 0; i < player2->getHandSize(); i++)
+    {
+        for (unsigned j = 0; j < AIList.size(); j++)
+        {
+            if (checkValid(player2->getHand()->getTile(i), AIList[j].getRow(),
+                           AIList[j].getCol()) == true)
+            {
+                placeTile(player2->getHand()->getTile(i), AIList[j].getRow(), AIList[j].getCol());
+                if (
+                    highestScore < calculateScore(AIList[j].getRow(), AIList[j].getCol()))
+                {
+
+                    highestScore = calculateScore(AIList[j].getRow(), AIList[j].getCol());
+                    bestTile = player2->getHand()->getTile(i);
+                    bestRow = AIList[j].getRow();
+                    bestCol = AIList[j].getCol();
+                }
+                board[AIList[j].getRow()][AIList[j].getCol()] = nullptr;
+            }
+        }
+    }
+
+    if (noMove == false)
+    {
+        player2->addScore(placeTile(bestTile, bestRow, bestCol));
+        addNullAdjacentSpaces(bestRow, bestCol);
+    }
+    else
+    {
+        // replace tile code
+    }
+}
+
+void Game::addNullAdjacentSpaces(char row, int col)
+{
+
+    // need to add coordinates of space if not already in list AND value on board is NULL
+    Coordinate down(row + 1, col);
+    Coordinate up(row - 1, col);
+    Coordinate right(row, col + 1);
+    Coordinate left(row, col - 1);
+
+    if (AIList.size() == 0)
+    {
+        AIList.push_back(right);
+        AIList.push_back(left);
+        AIList.push_back(down);
+        AIList.push_back(up);
+    }
+    else
+    {
+        bool downflag = false;
+        bool upflag = false;
+        bool rightflag = false;
+        bool leftflag = false;
+
+        for (unsigned i = 0; AIList.size() > i; i++)
+        {
+            if (down.isSpaceNull(board) == false)
+            {
+                // cout << "AIList[]: " << AIList[i].getRow() << AIList[i].getCol() << endl;
+                // cout << "down: " << down.getRow() << down.getCol() << endl;
+                downflag = true;
+            }
+            else
+            {
+                if (AIList[i].isEqual(down) == true)
+                {
+                    downflag = true;
+                }
+            }
+            if (up.isSpaceNull(board) == false)
+            {
+                // cout << "AIList[]: " << AIList[i].getRow() << AIList[i].getCol() << endl;
+                // cout << "up: " <<    up.getRow() << up.getCol() << endl;
+                upflag = true;
+            }
+            else
+            {
+                if (AIList[i].isEqual(up) == true)
+                {
+                    upflag = true;
+                }
+            }
+            if (right.isSpaceNull(board) == false)
+            {
+                // cout << "AIList[]: " << AIList[i].getRow() << AIList[i].getCol() << endl;
+                // cout << "right: " << right.getRow() << right.getCol() << endl;
+                rightflag = true;
+            }
+            else
+            {
+                if (AIList[i].isEqual(right) == true)
+                {
+                    rightflag = true;
+                }
+            }
+            if (left.isSpaceNull(board) == false)
+            {
+                // cout << "AIList[]: " << AIList[i].getRow() << AIList[i].getCol() << endl;
+                // cout << "left: " << left.getRow() << left.getCol() << endl;
+                leftflag = true;
+            }
+            else
+            {
+                if (AIList[i].isEqual(left) == true)
+                {
+                    leftflag = true;
+                }
+            }
+        }
+        // cout << "left: " << board[row][col - 1]->colour << board[row][col - 1]->shape << endl;
+
+        if (downflag == false)
+        {
+            cout << "Down added: " << down.getRow() << down.getCol() << endl;
+            AIList.push_back(down);
+        }
+        if (upflag == false)
+        {
+            cout << "Up added: " << up.getRow() << up.getCol() << endl;
+            AIList.push_back(up);
+        }
+        if (rightflag == false)
+        {
+            cout << "Right added: " << right.getRow() << right.getCol() << endl;
+            AIList.push_back(right);
+        }
+        if (leftflag == false)
+        {
+            cout << "Left added: " << left.getRow() << left.getCol() << endl;
+            AIList.push_back(left);
+        }
+
+        // removes non-null spaces from AIList
+        vector<Coordinate> newList;
+        for (unsigned i = 0; AIList.size() > i; i++)
+        {
+            if (AIList[i].isSpaceNull(board) == true)
+            {
+                newList.push_back(AIList[i]);
+            }
+        }
+
+        AIList = newList;
+    }
+
+    cout << "AIList contains: " << endl;
+    for (unsigned i = 0; i < AIList.size(); i++)
+    {
+        cout << AIList[i].getRow() << AIList[i].getCol() << endl;
+    }
+    cout << "--------" << endl;
 }
 
 bool Game::checkForPlayableTiles(LinkedList *list)
@@ -265,15 +445,22 @@ void Game::newGame()
 
     if (!cin.eof())
     {
-        do
+        if (ai == true)
         {
-            cout << endl;
-            cout << "Enter a name for player 2 (letters only)" << endl;
+            p2 = "AI";
+        }
+        else
+        {
+            do
+            {
+                cout << endl;
+                cout << "Enter a name for player 2 (letters only)" << endl;
 
-            cout << "> ";
-            getline(cin, p2);
+                cout << "> ";
+                getline(cin, p2);
 
-        } while (validateName(p2) != false);
+            } while (validateName(p2) != false);
+        }
     }
 
     if (!cin.eof())
@@ -407,9 +594,10 @@ void Game::printBoard(vector<vector<Tile *>> board)
                      << "|";
             }
             else
-            { 
-                cout << printColour(board, i, j) << board[i][j]->colour 
-                << board[i][j]->shape << "\033[38;5;15m" << "|";
+            {
+                cout << printColour(board, i, j) << board[i][j]->colour
+                     << board[i][j]->shape << "\033[38;5;15m"
+                     << "|";
             }
         }
         cout << endl;
@@ -417,40 +605,41 @@ void Game::printBoard(vector<vector<Tile *>> board)
     cout << endl;
 }
 
-string Game::printColour(vector<vector<Tile *>> board, int i, int j){
+string Game::printColour(vector<vector<Tile *>> board, int i, int j)
+{
     string colour = "";
 
     char c = board[i][j]->colour;
 
-    if (disableColour == false){
-
-    // cout << [COLOUR] "text" << endl
-    switch(c)
+    if (disableColour == false)
     {
+
+        // cout << [COLOUR] "text" << endl
+        switch (c)
+        {
         case 'R':
-        colour = "\033[38;5;196m";
-        break;
+            colour = "\033[38;5;196m";
+            break;
         case 'O':
-        colour = "\033[38;5;208m";
-        break;
+            colour = "\033[38;5;208m";
+            break;
         case 'Y':
-        colour = "\033[38;5;226m";
-        break;
+            colour = "\033[38;5;226m";
+            break;
         case 'G':
-        colour = "\033[38;5;10m";
-        break;
+            colour = "\033[38;5;10m";
+            break;
         case 'B':
-        colour = "\033[38;5;33m";
-        break;
+            colour = "\033[38;5;33m";
+            break;
         case 'P':
-        colour = "\033[38;5;57m";
-        break;
+            colour = "\033[38;5;57m";
+            break;
         default:
-        colour = "";
+            colour = "";
+        }
     }
 
-    }
-    
     return colour;
 }
 
@@ -987,6 +1176,12 @@ void Game::getPrompt(Player *player)
                     player->addScore(placeTile(player->playTile(colour, shape), row, col));
                     valid = true;
 
+                    // add squares to AIList if AI enabled
+                    if (ai == true)
+                    {
+                        addNullAdjacentSpaces(row, col);
+                    }
+
                     // unset firstMove after first tile is placed
                     if (this->firstMove)
                     {
@@ -1071,18 +1266,20 @@ void Game::getPrompt(Player *player)
         // if the first world is "save" and the file name has at least one letter
         else if (sameCaseInsensitive(input.substr(0, 4), "save") && input.length() >= 5)
         {
-            if(firstMove == false){
-            string filename = input.erase(0, 5);
-            saveGame(filename);
+            if (firstMove == false)
+            {
+                string filename = input.erase(0, 5);
+                saveGame(filename);
 
-            // ask for prompt again as save is an extra action that shouldn't
-            // prevent the player to make a move
-            cout << "Game successfully saved as '" << filename << "'." << endl;
-            cout << "What is your next move? \n"
-                 << endl;
-            valid = false;
+                // ask for prompt again as save is an extra action that shouldn't
+                // prevent the player to make a move
+                cout << "Game successfully saved as '" << filename << "'." << endl;
+                cout << "What is your next move? \n"
+                     << endl;
+                valid = false;
             }
-            else {
+            else
+            {
                 cout << "No game data to save" << endl;
             }
         }
@@ -1121,26 +1318,29 @@ void Game::clearScreen()
     // cout << "\x1B[2J\x1B[H";
 }
 
-void Game::checkArgs(int argc, char** argv){
+void Game::checkArgs(int argc, char **argv)
+{
 
-      // iterate through argv and check each argument for a related command
+    // iterate through argv and check each argument for a related command
 
-    cout << "Arg is: " << argv[1] << endl;
-     for (int i = 1; i < argc; i++){
-        if (strcmp(argv[i], "--ai") == 0){
+    for (int i = 1; i < argc; i++)
+    {
+        // ENABLE ai
+        if (strcmp(argv[i], "--ai") == 0)
+        {
             this->ai = true;
-        } else {
-            this->ai = false;
         }
-        if (strcmp(argv[i], "--enh") == 0){
-            this->disableEnhance = true;
-        } else {
-            this->disableEnhance = false;
-        }
-        if (strcmp(argv[i], "--col") == 0){
+
+        // disable ALL enhancements
+        if (strcmp(argv[i], "--enh") == 0)
+        {
             this->disableColour = true;
-        }else {
-            this->disableColour = false;
+        }
+
+        // disable coloured tiles
+        if (strcmp(argv[i], "--col") == 0)
+        {
+            this->disableColour = true;
         }
     }
 }

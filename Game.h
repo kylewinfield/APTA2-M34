@@ -8,6 +8,7 @@
 #include "LinkedList.h"
 #include "TileCodes.h"
 #include "Player.h"
+#include "Coordinate.h"
 
 #define ROWS 'Z'
 #define COLS 26
@@ -71,6 +72,10 @@ public:
 
    // colour board tiles
    string printColour(vector<vector<Tile *>> board, int i, int j);
+   
+   //AI related functions:
+   void AITurn();
+   void addNullAdjacentSpaces(char row, int col);
 
 private:
    vector<vector<Tile *>> board;
@@ -106,8 +111,10 @@ private:
 
    // enhancments states for disabling/enabling via command line
    bool ai;
-   bool disableEnhance;
    bool disableColour;
+
+   // list of spaces around placed tiles that are vacant (used for AI implementation)
+   vector <Coordinate> AIList;
 };
 
 #endif // ASSIGN2_GAME_H
