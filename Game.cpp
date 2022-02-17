@@ -686,6 +686,11 @@ void Game::saveGame(string filename)
 {
     ofstream savefile;
     savefile.open("Saved/" + filename + ".save");
+    if (ai == true)
+    {
+        savefile << "#aifile"
+                 << "\n";
+    }
     savefile << player1->getName() << "\n";
     savefile << player1->getScore() << "\n";
     savefile << player1->viewHand(true) << "\n";
@@ -734,12 +739,29 @@ void Game::saveGame(string filename)
         savefile << player2->getName() << endl;
     }
 
+    // saving contents of AIList
+    string AIListString = "";
+
+    if (ai == true)
+    {
+        for (unsigned i = 0; i < AIList.size(); i++)
+        {
+            AIListString.push_back(AIList[i].getRow());
+            AIListString.append(to_string(AIList[i].getCol()));
+            AIListString.append(",");
+        }
+        AIListString.pop_back(); // removes last comma in csv
+
+        savefile << AIListString << "\n";
+    }
+
     savefile.close();
 }
 
 bool Game::loadFile(string filename)
 {
     bool fileExist;
+
     ifstream loadfile("Saved/" + filename + ".save");
     if (loadfile.fail())
     {
@@ -747,55 +769,92 @@ bool Game::loadFile(string filename)
     }
     else
     {
-
         fileExist = true;
+
         string temp; // string holds data as it is read in
 
-        // player 1 name
-        getline(loadfile, temp);
-        player1 = new Player(temp);
-
-        // player 1 score
-        getline(loadfile, temp);
-        player1->addScore(stoi(temp));
-
-        // player 1 hand
-        readHand(loadfile, player1);
-
-        // player 2 name
-        getline(loadfile, temp);
-        player2 = new Player(temp);
-
-        // player 2 score
-        getline(loadfile, temp);
-        player2->addScore(stoi(temp));
-
-        // player 2 hand
-        readHand(loadfile, player2);
-
-        // Board shape (CURRENTLY NOT STORED ANYWHERE)
-        readBSize(loadfile);
-
-        // Board state
-        board = readBoard(loadfile);
-
-        // Tile bag contents
-        readBag(loadfile);
-
-        // current player turn name
-        getline(loadfile, temp);
-        if (temp == player1->getName())
+        if (ai == true)
         {
-            playerTurn = true;
+            getline(loadfile, temp);
+            if (temp == "#aifile")
+            {
+                readStandardFormat(loadfile);
+                readAIList(loadfile);
+
+            } else{
+                cout << "Error: wrong file format, please load an AI file format while in AI mode" << endl;
+            }
+        } else{
+            readStandardFormat(loadfile);
         }
-        else if (temp == player2->getName())
-        {
-            playerTurn = false;
-        }
+
     }
     loadfile.close();
 
     return fileExist;
+}
+
+void Game::readAIList(ifstream &stream){
+
+    string line, coordString;
+    char delimiter = ',';
+
+    getline(stream, line);
+    stringstream sstream(line);
+
+    while (getline(sstream, coordString, delimiter))
+    {
+        Coordinate coord(coordString.at(0), coordString.at(1) - 48);
+        AIList.push_back(coord);
+    }
+}
+
+void Game::readStandardFormat(ifstream &stream)
+{
+    string temp;
+
+    // player 1 name
+    getline(stream, temp);
+    player1 = new Player(temp);
+
+    // player 1 score
+    getline(stream, temp);
+    player1->addScore(stoi(temp));
+
+    // player 1 hand
+    readHand(stream, player1);
+
+    // player 2 name
+    getline(stream, temp);
+    player2 = new Player(temp);
+
+    // player 2 score
+    getline(stream, temp);
+    player2->addScore(stoi(temp));
+
+    // player 2 hand
+    readHand(stream, player2);
+
+    // Board shape (CURRENTLY NOT STORED ANYWHERE)
+    readBSize(stream);
+
+    // Board state
+    board = readBoard(stream);
+
+    // Tile bag contents
+    readBag(stream);
+
+    // current player turn name
+    getline(stream, temp);
+    if (temp == player1->getName())
+    {
+        playerTurn = true;
+    }
+    else if (temp == player2->getName())
+    {
+        playerTurn = false;
+    }
+
 }
 
 void Game::readBag(ifstream &stream)

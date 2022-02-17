@@ -61,6 +61,10 @@ public:
    int *readBSize(ifstream &stream);
    // reads in tile bag data from file
    void readBag(ifstream &stream);
+   // reads in AIList from file
+   void readAIList(ifstream &stream);
+   // reads in all line from standard format (non AI)
+   void readStandardFormat( ifstream &stream);
 
    // clears the current contents of the terminal
    void clearScreen();
@@ -73,8 +77,10 @@ public:
    // colour board tiles
    string printColour(vector<vector<Tile *>> board, int i, int j);
    
-   //AI related functions:
+   // AI related functions:
+   // AI performs it's turn
    void AITurn();
+   // adds empty adj spaces from tile just placed to AIList
    void addNullAdjacentSpaces(char row, int col);
 
 private:
