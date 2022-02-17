@@ -63,8 +63,8 @@ public:
    void readBag(ifstream &stream);
    // reads in AIList from file
    void readAIList(ifstream &stream);
-   // reads in all line from standard format (non AI)
-   void readStandardFormat( ifstream &stream);
+   // reads in all line from standard format, returns true if file is in AI format
+   bool readStandardFormat( ifstream &stream);
 
    // clears the current contents of the terminal
    void clearScreen();

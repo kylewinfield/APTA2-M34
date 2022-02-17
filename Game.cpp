@@ -760,41 +760,47 @@ void Game::saveGame(string filename)
 
 bool Game::loadFile(string filename)
 {
-    bool fileExist;
+    // return status:
+    // 0 = can't find file
+    // 1 = file exists and loaded
+    // 2 = wrong file format
+    int fileExist;
 
     ifstream loadfile("Saved/" + filename + ".save");
     if (loadfile.fail())
     {
-        fileExist = false;
+        fileExist = 0;
     }
     else
     {
-        fileExist = true;
-
-        string temp; // string holds data as it is read in
-
         if (ai == true)
         {
-            getline(loadfile, temp);
-            if (temp == "#aifile")
+            if (readStandardFormat(loadfile) == true)
             {
-                readStandardFormat(loadfile);
                 readAIList(loadfile);
-
-            } else{
-                cout << "Error: wrong file format, please load an AI file format while in AI mode" << endl;
+                fileExist = 1;
             }
-        } else{
-            readStandardFormat(loadfile);
+            else
+            {
+                fileExist = 2;
+            }
         }
-
+        else
+        {
+            if (readStandardFormat(loadfile) == false){
+                fileExist = 1;
+            } else{
+                fileExist = 2;
+            }
+        }
     }
     loadfile.close();
 
     return fileExist;
 }
 
-void Game::readAIList(ifstream &stream){
+void Game::readAIList(ifstream &stream)
+{
 
     string line, coordString;
     char delimiter = ',';
@@ -809,13 +815,23 @@ void Game::readAIList(ifstream &stream){
     }
 }
 
-void Game::readStandardFormat(ifstream &stream)
+bool Game::readStandardFormat(ifstream &stream)
 {
+    bool AIForm = false;
     string temp;
 
-    // player 1 name
+    // checks if file is AIfile format, if not then reads in player1 name
     getline(stream, temp);
-    player1 = new Player(temp);
+    if (temp == "#aifile")
+    {
+        AIForm = true;
+        getline(stream, temp);
+        player1 = new Player(temp);
+    }
+    else
+    {
+        player1 = new Player(temp);
+    }
 
     // player 1 score
     getline(stream, temp);
@@ -855,6 +871,7 @@ void Game::readStandardFormat(ifstream &stream)
         playerTurn = false;
     }
 
+    return AIForm;
 }
 
 void Game::readBag(ifstream &stream)

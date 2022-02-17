@@ -88,13 +88,16 @@ void menu(int argc, char** argv)
          }else {
             game = new Game();
          }
-
-         if (game->loadFile(loadGame()) == true)
+         int loadStatus  = game->loadFile(loadGame()); 
+         if (loadStatus == 1)
          {
             // start game with loaded parameters
             cin.ignore();
             game->gameLoop();
             delete game;
+         }
+         else if (loadStatus == 2){
+            cout << "Error: wrong file format\n" << endl;
          }
          else if (cin.eof())
          {
@@ -103,7 +106,7 @@ void menu(int argc, char** argv)
             cout << endl;
             quit = true;
          }
-         else
+         else if (loadStatus == 0)
          {
             cout << "File does not exist";
             cout << endl;
