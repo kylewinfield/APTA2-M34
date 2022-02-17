@@ -787,9 +787,12 @@ bool Game::loadFile(string filename)
         }
         else
         {
-            if (readStandardFormat(loadfile) == false){
+            if (readStandardFormat(loadfile) == false)
+            {
                 fileExist = 1;
-            } else{
+            }
+            else
+            {
                 fileExist = 2;
             }
         }
@@ -810,8 +813,19 @@ void Game::readAIList(ifstream &stream)
 
     while (getline(sstream, coordString, delimiter))
     {
-        Coordinate coord(coordString.at(0), coordString.at(1) - 48);
-        AIList.push_back(coord);
+        if (coordString.length() == 2)
+        {
+            Coordinate coord(coordString.at(0), coordString.at(1) - 48);
+            AIList.push_back(coord);
+        }
+        else if (coordString.length() == 3)
+        {
+            string twoDigit;
+            twoDigit.push_back(coordString.at(1) - 48);
+            twoDigit.push_back(coordString.at(2) - 48);
+            Coordinate coord(coordString.at(0), stoi(twoDigit));
+            AIList.push_back(coord);
+        }
     }
 }
 
