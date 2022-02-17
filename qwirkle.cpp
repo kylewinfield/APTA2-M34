@@ -4,7 +4,6 @@
 #include "LinkedList.h"
 #include "Player.h"
 
-
 using std::cin;
 using std::cout;
 using std::endl;
@@ -90,7 +89,7 @@ void menu(int argc, char** argv)
          }else {
             game = new Game();
          }
-         
+
          loadStatus  = game->loadFile(loadGame()); 
          if (loadStatus == 1)
          {

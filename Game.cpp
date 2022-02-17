@@ -6,6 +6,7 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <random>
 
 #include "Game.h"
 
@@ -192,36 +193,56 @@ void Game::gameLoop()
 
 void Game::AITurn()
 {
-    // data needed to perform 'best' move
+    // data needed to perform 'best' and 'worst' move
     int highestScore = 0;
     Tile *bestTile = nullptr;
     char bestRow = '-';
     int bestCol = 0;
 
     // flag if no available moves
-    bool noMove = false;
+    bool noMove = true;
 
     // ->Iterate through hand (get each tile).
     // -->Calculate possible scores from that tile on each space in AIList, that is
     // a valid move.
     // ->After iterating through all tiles, select highest scoring move and perform it
 
-    for (int i = 0; i < player2->getHandSize(); i++)
+    if (AIList.size() == 0)
     {
-        for (unsigned j = 0; j < AIList.size(); j++)
-        {
-            if (checkValid(player2->getHand()->getTile(i), AIList[j].getRow(),
-                           AIList[j].getCol()) == true)
-            {
-                placeTile(player2->getHand()->getTile(i), AIList[j].getRow(), AIList[j].getCol());
-                if (
-                    highestScore < calculateScore(AIList[j].getRow(), AIList[j].getCol()))
-                {
+        // if p1 decides to replace a tile, AI will place a random tile at a random space
+        std::random_device engine;
+        std::uniform_int_distribution<int> distribution(0, player2->getHandSize() - 1);
+        int i = distribution(engine);
 
-                    highestScore = calculateScore(AIList[j].getRow(), AIList[j].getCol());
-                    bestTile = player2->getHand()->getTile(i);
-                    bestRow = AIList[j].getRow();
-                    bestCol = AIList[j].getCol();
+        Colour colour = player2->getHand()->getTile(i)->colour;
+        Shape shape = player2->getHand()->getTile(i)->shape;
+
+        char row = 'A' + i;
+        int col = distribution(engine);
+
+        player2->addScore(placeTile(player2->playTile(colour, shape), row, col));
+        addNullAdjacentSpaces(colour, shape);
+    }
+    else
+    {
+        for (int i = 0; i < player2->getHandSize(); i++)
+        {
+            for (unsigned j = 0; j < AIList.size(); j++)
+            {
+                if (checkValid(player2->getHand()->getTile(i), AIList[j].getRow(),
+                               AIList[j].getCol()) == true)
+                {
+                    noMove = false;
+                    placeTile(player2->getHand()->getTile(i), AIList[j].getRow(), AIList[j].getCol());
+                    if (
+                        highestScore < calculateScore(AIList[j].getRow(), AIList[j].getCol()))
+                    {
+                        // if move valid, finds highest scoring move
+                        highestScore = calculateScore(AIList[j].getRow(), AIList[j].getCol());
+                        bestTile = player2->getHand()->getTile(i);
+                        bestRow = AIList[j].getRow();
+                        bestCol = AIList[j].getCol();
+                    }
                 }
                 board[AIList[j].getRow()][AIList[j].getCol()] = nullptr;
             }
@@ -230,12 +251,16 @@ void Game::AITurn()
 
     if (noMove == false)
     {
+        // add tile
         player2->addScore(placeTile(player2->playTile(bestTile->colour, bestTile->shape), bestRow, bestCol));
         addNullAdjacentSpaces(bestRow, bestCol);
     }
     else
     {
-        // replace tile code
+        // replace tile
+        Tile *worstTile = nullptr;
+
+        tileBag->addToRandomLocation(worstTile);
     }
 }
 
