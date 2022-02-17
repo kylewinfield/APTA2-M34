@@ -211,14 +211,16 @@ void Game::AITurn()
     {
         // if p1 decides to replace a tile, AI will place a random tile at a random space
         std::random_device engine;
-        std::uniform_int_distribution<int> distribution(0, player2->getHandSize() - 1);
-        int i = distribution(engine);
+        std::uniform_int_distribution<int> distribution1(0, player2->getHandSize() - 1);
+        std::uniform_int_distribution<int> distribution2(0, 25);
+        int i = distribution1(engine);
+        int j = distribution2(engine);
 
         Colour colour = player2->getHand()->getTile(i)->colour;
         Shape shape = player2->getHand()->getTile(i)->shape;
 
-        char row = 'A' + i;
-        int col = distribution(engine);
+        char row = 'A' + j;
+        int col = distribution2(engine);
 
         player2->addScore(placeTile(player2->playTile(colour, shape), row, col));
         addNullAdjacentSpaces(colour, shape);
