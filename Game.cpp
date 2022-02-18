@@ -19,28 +19,6 @@ using std::string;
 using std::stringstream;
 using std::vector;
 
-Game::Game()
-{
-    // initialise tileBag
-    this->tileBag = new LinkedList;
-
-    // intialise checks to false
-    this->gameOver = false;
-    this->qwirkleScored = false;
-    this->cellOccupied = false;
-    this->notAdjacent = false;
-    this->tileMismatch = false;
-    this->lineTooLong = false;
-    this->sameTileInLine = false;
-    this->invalidCommand = false;
-    this->tileNotInHand = false;
-    this->playerTurn = true;
-
-    this->ai = false;
-    this->disableColour = false;
-    this->disableUnicode = false;
-};
-
 Game::Game(int argc, char **argv)
 {
     // initialise tileBag
@@ -57,6 +35,10 @@ Game::Game(int argc, char **argv)
     this->invalidCommand = false;
     this->tileNotInHand = false;
     this->playerTurn = true;
+
+    this->disableColour = false;
+    this->disableUnicode = false;
+    this->ai = false;
 
     checkArgs(argc, argv);
 }
@@ -817,7 +799,7 @@ void Game::saveGame(string filename)
     savefile.close();
 }
 
-bool Game::loadFile(string filename)
+int Game::loadFile(string filename)
 {
     // return status:
     // 0 = can't find file
@@ -1519,7 +1501,6 @@ void Game::clearScreen()
 
 void Game::checkArgs(int argc, char **argv)
 {
-
     // iterate through argv and check each argument for a related command
 
     for (int i = 1; i < argc; i++)
@@ -1530,7 +1511,7 @@ void Game::checkArgs(int argc, char **argv)
             this->ai = true;
         }
 
-        // disable ALL enhancements
+        // disable ALL enhancements (excluding ai)
         if (strcmp(argv[i], "--enh") == 0)
         {
             this->disableColour = true;
@@ -1541,12 +1522,12 @@ void Game::checkArgs(int argc, char **argv)
         if (strcmp(argv[i], "--col") == 0)
         {
             this->disableColour = true;
-        }
+        } 
 
         if (strcmp(argv[i], "--uni") == 0)
         {
             this->disableUnicode = true;
-        }
+        } 
     }
 }
 

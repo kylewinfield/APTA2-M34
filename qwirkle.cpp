@@ -11,7 +11,7 @@ using std::ofstream;
 using std::string;
 using std::vector;
 
-void menu(int argc, char** argv);
+void menu(int argc, char **argv);
 void showCredits();
 void printBoard(vector<vector<Tile *>> board);
 void clearScreen();
@@ -20,7 +20,7 @@ string loadGame();
 Game *game;
 bool quit;
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
    // on launch message
    cout << "Welcome to Qwirkle!" << endl;
@@ -29,7 +29,7 @@ int main(int argc, char** argv)
    quit = false;
    while (!quit && !cin.eof())
    {
-         menu(argc, argv);
+      menu(argc, argv);
    }
 
    // checks for Control-D / EOF
@@ -44,7 +44,7 @@ int main(int argc, char** argv)
 }
 
 // main selection menu implemented as switch statement
-void menu(int argc, char** argv)
+void menu(int argc, char **argv)
 {
    cout << "Menu" << endl;
    cout << "----" << endl;
@@ -67,11 +67,8 @@ void menu(int argc, char** argv)
       {
       case 1:
          // create new game
-         if (argc > 1){
-            game = new Game(argc, argv);
-         }else {
-            game = new Game();
-         }
+         game = new Game(argc, argv);
+
          game->newGame();
          // start game with loaded parameters
          if (!cin.eof())
@@ -83,22 +80,22 @@ void menu(int argc, char** argv)
          break;
       case 2:
 
-         if (argc > 1){
-            game = new Game(argc, argv);
-         }else {
-            game = new Game();
-         }
+         game = new Game(argc, argv);
 
-         loadStatus  = game->loadFile(loadGame()); 
-         if (loadStatus == 1)
+         loadStatus = game->loadFile(loadGame());
+
+         if (loadStatus == 2)
          {
+            cout << "Error: wrong file format\n"
+                 << endl;
+         }
+         else if (loadStatus == 1)
+         {
+
             // start game with loaded parameters
             cin.ignore();
             game->gameLoop();
             delete game;
-         }
-         else if (loadStatus == 2){
-            cout << "Error: wrong file format\n" << endl;
          }
          else if (cin.eof())
          {

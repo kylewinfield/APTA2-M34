@@ -29,7 +29,7 @@ public:
    // save the current game to a file
    void saveGame(string filename);
    // loads game from file
-   bool loadFile(string filename);
+   int loadFile(string filename);
    // main loop handling gameplay and player turns
    void gameLoop();
    // populate the tile bag with a new set of tiles for a new game
@@ -117,7 +117,7 @@ private:
    // generic error
    bool invalidCommand;
 
-   // enhancments states for disabling/enabling via command line
+   // enhancements states for disabling/enabling via command line
    bool ai;
    bool disableColour;
    bool disableUnicode;
