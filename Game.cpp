@@ -223,8 +223,9 @@ void Game::AITurn()
         char row = 'A' + j;
         int col = distribution2(engine);
 
-        player2->addScore(placeTile(player2->playTile(colour, shape), row, col));
-        addNullAdjacentSpaces(colour, shape);
+        player2->addScore(1);
+        placeTile(player2->playTile(colour, shape), row, col);
+        addNullAdjacentSpaces(row, col);
     }
     else
     {
@@ -325,8 +326,6 @@ void Game::addNullAdjacentSpaces(char row, int col)
             }
             else if (down.isSpaceNull(board) == false)
             {
-                // cout << "AIList[]: " << AIList[i].getRow() << AIList[i].getCol() << endl;
-                // cout << "down: " << down.getRow() << down.getCol() << endl;
                 downflag = true;
             }
             else
@@ -343,8 +342,6 @@ void Game::addNullAdjacentSpaces(char row, int col)
             }
             else if (up.isSpaceNull(board) == false)
             {
-                // cout << "AIList[]: " << AIList[i].getRow() << AIList[i].getCol() << endl;
-                // cout << "up: " <<    up.getRow() << up.getCol() << endl;
                 upflag = true;
             }
             else
@@ -361,8 +358,6 @@ void Game::addNullAdjacentSpaces(char row, int col)
             }
             else if (right.isSpaceNull(board) == false)
             {
-                // cout << "AIList[]: " << AIList[i].getRow() << AIList[i].getCol() << endl;
-                // cout << "right: " << right.getRow() << right.getCol() << endl;
                 rightflag = true;
             }
             else
@@ -379,8 +374,6 @@ void Game::addNullAdjacentSpaces(char row, int col)
             }
             else if (left.isSpaceNull(board) == false)
             {
-                // cout << "AIList[]: " << AIList[i].getRow() << AIList[i].getCol() << endl;
-                // cout << "left: " << left.getRow() << left.getCol() << endl;
                 leftflag = true;
             }
             else
@@ -395,22 +388,18 @@ void Game::addNullAdjacentSpaces(char row, int col)
         // if flag triggered, do not add to AIList
         if (downflag == false)
         {
-            cout << "Down added: " << down.getRow() << down.getCol() << endl;
             AIList.push_back(down);
         }
         if (upflag == false)
         {
-            cout << "Up added: " << up.getRow() << up.getCol() << endl;
             AIList.push_back(up);
         }
         if (rightflag == false)
         {
-            cout << "Right added: " << right.getRow() << right.getCol() << endl;
             AIList.push_back(right);
         }
         if (leftflag == false)
         {
-            cout << "Left added: " << left.getRow() << left.getCol() << endl;
             AIList.push_back(left);
         }
 
@@ -428,12 +417,6 @@ void Game::addNullAdjacentSpaces(char row, int col)
         AIList = newList;
     }
 
-    cout << "AIList contains: " << endl;
-    for (unsigned i = 0; i < AIList.size(); i++)
-    {
-        cout << AIList[i].getRow() << AIList[i].getCol() << endl;
-    }
-    cout << "--------" << endl;
 }
 
 bool Game::checkForPlayableTiles(LinkedList *list)

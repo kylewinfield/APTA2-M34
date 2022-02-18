@@ -91,7 +91,7 @@ string Player::viewHand(bool disableColour, bool disableUni)
             // Add formatting if not the first tile
             if (firstLoop == false)
             {
-                playerHandString.append("| ");
+                playerHandString.append(" | ");
             }
             char colourChar = playerHand->getTile(i)->colour;
             string shapeString = to_string(playerHand->getTile(i)->shape);
