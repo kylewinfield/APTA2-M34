@@ -259,10 +259,18 @@ void Game::AITurn()
     }
     else
     {
-        // replace tile
-        Tile *worstTile = nullptr;
+        // replace tile, works randomly since replace tile has very little
+        // value in qwirkle version where you can only place 1 tile at a time
 
-        tileBag->addToRandomLocation(worstTile);
+        std::random_device engine;
+        std::uniform_int_distribution<int> distribution(0, player2->getHandSize() - 1);
+
+        int i = distribution(engine);
+
+        Colour colour = player2->getHand()->getTile(i)->colour;
+        Shape shape = player2->getHand()->getTile(i)->shape;
+
+        tileBag->addToRandomLocation(player2->playTile(colour, shape));
     }
 }
 
