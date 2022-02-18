@@ -25,7 +25,6 @@ int main(int argc, char** argv)
    // on launch message
    cout << "Welcome to Qwirkle!" << endl;
    cout << "-------------------" << endl;
-   cout << "☘ ● ✦ ◆ ■ ✶" << endl;
 
    quit = false;
    while (!quit && !cin.eof())

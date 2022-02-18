@@ -38,6 +38,7 @@ Game::Game()
 
     this->ai = false;
     this->disableColour = false;
+    this->disableUnicode = false;
 };
 
 Game::Game(int argc, char **argv)
@@ -670,13 +671,53 @@ void Game::printBoard(vector<vector<Tile *>> board)
             else
             {
                 cout << printColour(board, i, j) << board[i][j]->colour
-                     << board[i][j]->shape << "\033[38;5;15m"
+                     << printShape(board, i, j) << "\033[38;5;15m"
                      << "|";
             }
         }
         cout << endl;
     }
     cout << endl;
+}
+
+string Game::printShape(vector<vector<Tile *>> board, int i, int j)
+{
+
+    string shape = "";
+
+    int s = board[i][j]->shape;
+
+    if (disableUnicode == false)
+    {
+
+        switch (s)
+        {
+        case 1:
+            shape = "●";
+            break;
+        case 2:
+            shape = "✦";
+            break;
+        case 3:
+            shape = "◆";
+            break;
+        case 4:
+            shape = "■";
+            break;
+        case 5:
+            shape = "✶";
+            break;
+        case 6:
+            shape = "☘";
+            break;
+        }
+    }
+    else
+    {
+        shape = to_string(s);
+    }
+
+    return shape;
 }
 
 string Game::printColour(vector<vector<Tile *>> board, int i, int j)
@@ -728,10 +769,10 @@ void Game::saveGame(string filename)
     }
     savefile << player1->getName() << "\n";
     savefile << player1->getScore() << "\n";
-    savefile << player1->viewHand(true) << "\n";
+    savefile << player1->viewHand(true, true) << "\n";
     savefile << player2->getName() << "\n";
     savefile << player2->getScore() << "\n";
-    savefile << player2->viewHand(true) << "\n";
+    savefile << player2->viewHand(true, true) << "\n";
 
     // board dimensions
     int rowLength = 0;
@@ -1304,7 +1345,8 @@ void Game::getPrompt(Player *player)
     cout << player2->getName() << ": " << player2->getScore() << " points" << endl;
     cout << endl;
     cout << player->getName() << ", it's your turn, your hand is:" << endl;
-    cout << player->viewHand(disableColour) << endl;
+    cout << player->viewHand(disableColour, disableUnicode) << endl;
+
     cout << endl;
 
     string input;
@@ -1360,7 +1402,8 @@ void Game::getPrompt(Player *player)
                     displayErrors();
                     cout << endl;
                     cout << "Tiles available:" << endl;
-                    cout << player->viewHand(disableColour) << endl;
+                    cout << player->viewHand(disableColour, disableUnicode) << endl;
+        
                 }
             }
             else if (input.length() == 15)
@@ -1402,7 +1445,8 @@ void Game::getPrompt(Player *player)
                         displayErrors();
                         cout << endl;
                         cout << "Tiles available:" << endl;
-                        cout << player->viewHand(disableColour) << endl;
+                        cout << player->viewHand(disableColour, disableUnicode) << endl;
+
                     }
                 }
             }
@@ -1429,7 +1473,8 @@ void Game::getPrompt(Player *player)
                 displayErrors();
                 cout << endl;
                 cout << "Tiles available:" << endl;
-                cout << player->viewHand(disableColour) << endl;
+                cout << player->viewHand(disableColour, disableUnicode) << endl;
+        
             }
         }
         // command to save game
@@ -1468,7 +1513,8 @@ void Game::getPrompt(Player *player)
             displayErrors();
             cout << endl;
             cout << "Tiles available:" << endl;
-            cout << player->viewHand(disableColour) << endl;
+            cout << player->viewHand(disableColour, disableUnicode) << endl;
+      
         }
     }
 }
@@ -1505,12 +1551,18 @@ void Game::checkArgs(int argc, char **argv)
         if (strcmp(argv[i], "--enh") == 0)
         {
             this->disableColour = true;
+            this->disableUnicode = true;
         }
 
         // disable coloured tiles
         if (strcmp(argv[i], "--col") == 0)
         {
             this->disableColour = true;
+        }
+
+        if (strcmp(argv[i], "--uni") == 0)
+        {
+            this->disableUnicode = true;
         }
     }
 }

@@ -79,7 +79,7 @@ Tile *Player::playTile(Colour checkColour, Shape checkShape)
     return returnTile;
 }
 
-string Player::viewHand(bool disableColour)
+string Player::viewHand(bool disableColour, bool disableUni)
 {
     string playerHandString = "";
     bool firstLoop = true;
@@ -91,7 +91,7 @@ string Player::viewHand(bool disableColour)
             // Add formatting if not the first tile
             if (firstLoop == false)
             {
-                playerHandString.append(",");
+                playerHandString.append("| ");
             }
             char colourChar = playerHand->getTile(i)->colour;
             string shapeString = to_string(playerHand->getTile(i)->shape);
@@ -101,7 +101,16 @@ string Player::viewHand(bool disableColour)
                 playerHandString += printColour(i);
             }
             playerHandString += colourChar;
-            playerHandString.append(shapeString);
+
+            if (disableUni == false)
+            {
+                playerHandString += printUnicode(i);
+            }
+            else
+            {
+                playerHandString.append(shapeString);
+            }
+
             if (disableColour == false)
             {
                 playerHandString.append("\033[38;5;15m");
@@ -109,7 +118,42 @@ string Player::viewHand(bool disableColour)
             firstLoop = false;
         }
     }
+    if (disableUni == false)
+    {
+        playerHandString.append("\n(1 = ● | 2 = ✦ |3 = ◆ | 4 = ■ | 5 = ✶ | 6 = ☘)");
+    }
     return playerHandString;
+}
+
+string Player::printUnicode(int i)
+{
+    string shape = "";
+
+    int s = playerHand->getTile(i)->shape;
+
+    switch (s)
+    {
+    case 1:
+        shape = "● ";
+        break;
+    case 2:
+        shape = "✦ ";
+        break;
+    case 3:
+        shape = "◆ ";
+        break;
+    case 4:
+        shape = "■ ";
+        break;
+    case 5:
+        shape = "✶ ";
+        break;
+    case 6:
+        shape = "☘ ";
+        break;
+    }
+
+    return shape;
 }
 
 string Player::printColour(int i)

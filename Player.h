@@ -19,10 +19,11 @@ public:
     int getScore();
     void addScore(int score);
     void addTile(Tile* tile);
-    string viewHand(bool disableColour);
+    string viewHand(bool disableColour, bool disableUni);
     int getHandSize();
     Tile *checkTile(Colour checkColour, Shape checkShape);
     string printColour(int i);
+    string printUnicode(int i);
 
     // Method to check if the tile exists in the players hand.
     // If tile exists, removes it from the player's hand and returns

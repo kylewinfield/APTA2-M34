@@ -74,8 +74,10 @@ public:
    //checks arguement for enhancement disable
    void checkArgs(int argc, char** argv);
 
-   // colour board tiles
+   // used for printing colour output for tile symbols
    string printColour(vector<vector<Tile *>> board, int i, int j);
+   // used for printing uni-code string for tile symbols
+   string printShape(vector<vector<Tile *>> board, int i, int j);
    
    // AI related functions:
    // AI performs it's turn
@@ -118,6 +120,7 @@ private:
    // enhancments states for disabling/enabling via command line
    bool ai;
    bool disableColour;
+   bool disableUnicode;
 
    // list of spaces around placed tiles that are vacant (used for AI implementation)
    vector <Coordinate> AIList;
