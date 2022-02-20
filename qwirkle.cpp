@@ -86,12 +86,10 @@ void menu(int argc, char **argv)
 
          if (loadStatus == 2)
          {
-            cout << "Error: wrong file format\n"
-                 << endl;
+            cout << "Error: wrong file format\n" << endl;
          }
          else if (loadStatus == 1)
          {
-
             // start game with loaded parameters
             cin.ignore();
             game->gameLoop();
